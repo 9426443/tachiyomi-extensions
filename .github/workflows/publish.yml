@@ -70,7 +70,9 @@ jobs:
           echo "value=$FP" >> "$GITHUB_OUTPUT"
 
       - name: Build extension
-        run: ./gradlew :src:zh:roumanwu:assembleRelease
+        run: |
+          ./gradlew :src:zh:roumanwu:spotlessApply
+          ./gradlew :src:zh:roumanwu:assembleRelease
 
       - name: Generate repository index
         env:
