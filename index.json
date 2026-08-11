@@ -1,0 +1,37 @@
+{
+  "name": "Roumanwu",
+  "badgeLabel": "RM",
+  "signingKey": "8510503cbe0a6b88172cd46d304f17d0e13630665639014bf255e33a298fb870",
+  "contact": {
+    "website": "https://raw.githubusercontent.com/9426443/tachiyomi-extensions/gh-pages"
+  },
+  "extensionList": {
+    "extensions": [
+      {
+        "name": "Roumanwu",
+        "packageName": "eu.kanade.tachiyomi.extension.zh.roumanwu",
+        "resources": {
+          "apkUrl": "https://raw.githubusercontent.com/9426443/tachiyomi-extensions/gh-pages/apk/tachiyomi-zh.roumanwu-v1.4.21.apk",
+          "iconUrl": "https://raw.githubusercontent.com/9426443/tachiyomi-extensions/gh-pages/icons/ic_launcher.png",
+          "jarUrl": "https://raw.githubusercontent.com/9426443/tachiyomi-extensions/gh-pages/jar/tachiyomi-zh.roumanwu-v1.4.21.jar"
+        },
+        "extensionLib": "1.4",
+        "versionCode": "21",
+        "versionName": "1.4.21",
+        "contentWarning": "CONTENT_WARNING_NSFW",
+        "sources": [
+          {
+            "id": "3647420805839021718",
+            "name": "\u8089\u6f2b\u5c4b",
+            "language": "zh",
+            "homeUrl": "https://roum28.xyz",
+            "mirrorUrls": [
+              "https://roum28.xyz",
+              "https://rouman5.com"
+            ]
+          }
+        ]
+      }
+    ]
+  }
+}
