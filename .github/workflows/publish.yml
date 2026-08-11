@@ -1,0 +1,89 @@
+name: Publish Roumanwu
+
+on:
+  push:
+    branches: [master]
+    paths:
+      - 'src/zh/roumanwu/**'
+      - '.github/workflows/publish.yml'
+      - '.github/scripts/**'
+      - 'core/**'
+      - 'compiler/**'
+      - 'common/**'
+      - 'gradle/**'
+      - 'build.gradle.kts'
+      - 'settings.gradle.kts'
+      - 'gradle.properties'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: publish
+  cancel-in-progress: true
+
+env:
+  ALIAS: roumanwu
+  KEY_STORE_PASSWORD: RM2026roumanwu
+  KEY_PASSWORD: RM2026roumanwu
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 45
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - uses: actions/setup-java@v4
+        with:
+          java-version: 17
+          distribution: temurin
+
+      - uses: gradle/actions/setup-gradle@v4
+
+      - name: Create signing key if missing
+        run: |
+          if [ ! -f signingkey.jks ]; then
+            keytool -genkeypair -v \
+              -keystore signingkey.jks \
+              -storepass "$KEY_STORE_PASSWORD" \
+              -alias "$ALIAS" \
+              -keypass "$KEY_PASSWORD" \
+              -dname "CN=Roumanwu" \
+              -keyalg RSA -keysize 2048 -validity 10000
+            git config user.name "github-actions[bot]"
+            git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+            git remote set-url origin "https://x-access-token:${GITHUB_TOKEN}@github.com/${GITHUB_REPOSITORY}.git"
+            git add signingkey.jks
+            git commit -m "chore: add extension signing key" || true
+            git push origin HEAD:master
+          fi
+
+      - name: Compute signing key fingerprint
+        id: fingerprint
+        run: |
+          keytool -exportcert -keystore signingkey.jks -alias "$ALIAS" -storepass "$KEY_STORE_PASSWORD" -rfc -file cert.pem
+          FP=$(openssl x509 -in cert.pem -noout -fingerprint -sha256 | sed 's/.*=//' | tr -d ':' | tr 'A-F' 'a-f')
+          echo "value=$FP" >> "$GITHUB_OUTPUT"
+
+      - name: Build extension
+        run: ./gradlew :src:zh:roumanwu:assembleRelease
+
+      - name: Generate repository index
+        env:
+          REPO_URL: https://raw.githubusercontent.com/${{ github.repository }}/gh-pages
+          SIGNING_KEY: ${{ steps.fingerprint.outputs.value }}
+        run: |
+          pip install protobuf
+          python .github/scripts/publish.py
+
+      - name: Deploy to gh-pages
+        uses: peaceiris/actions-gh-pages@v4
+        with:
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          publish_dir: ./public
+          publish_branch: gh-pages
+          force_orphan: true
