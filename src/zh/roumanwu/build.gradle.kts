@@ -17,7 +17,7 @@ keiyoushi {
         // 地址: https://rou.pub/dizhi or https://rdz3.xyz/dizhi
         baseUrl {
             mirrors(
-                "https://roum28.xyz",
+                "https://roum29.xyz",
                 "https://rouman5.com",
             )
         }
